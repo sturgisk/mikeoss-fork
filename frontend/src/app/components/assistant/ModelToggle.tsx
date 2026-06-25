@@ -16,7 +16,7 @@ import type { ApiKeyState } from "@/app/lib/mikeApi";
 export interface ModelOption {
     id: string;
     label: string;
-    group: "Anthropic" | "Google" | "OpenAI";
+    group: "Anthropic" | "Google" | "OpenAI" | "OpenRouter";
 }
 
 export const MODELS: ModelOption[] = [
@@ -40,13 +40,19 @@ export const SETTINGS_MODELS: ModelOption[] = [
         group: "Google",
     },
     { id: "gpt-5.4-lite", label: "GPT-5.4 Lite", group: "OpenAI" },
+    { id: "openai/gpt-4o", label: "GPT-4o (via OpenRouter)", group: "OpenRouter" },
+    { id: "openai/gpt-4o-mini", label: "GPT-4o Mini (via OpenRouter)", group: "OpenRouter" },
+    { id: "anthropic/claude-opus-4-5", label: "Claude Opus 4.5 (via OpenRouter)", group: "OpenRouter" },
+    { id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet 4.5 (via OpenRouter)", group: "OpenRouter" },
+    { id: "google/gemini-pro-1.5", label: "Gemini Pro 1.5 (via OpenRouter)", group: "OpenRouter" },
+    { id: "meta-llama/llama-3.1-8b-instruct", label: "Llama 3.1 8B (via OpenRouter)", group: "OpenRouter" },
 ];
 
 export const DEFAULT_MODEL_ID = "gemini-3-flash-preview";
 
 export const ALLOWED_MODEL_IDS = new Set(MODELS.map((m) => m.id));
 
-const GROUP_ORDER: ModelOption["group"][] = ["Anthropic", "Google", "OpenAI"];
+const GROUP_ORDER: ModelOption["group"][] = ["Anthropic", "Google", "OpenAI", "OpenRouter"];
 
 interface Props {
     value: string;

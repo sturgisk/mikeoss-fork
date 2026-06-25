@@ -28,6 +28,20 @@ export const CLAUDE_LOW_MODELS = ["claude-haiku-4-5"] as const;
 export const GEMINI_LOW_MODELS = ["gemini-3.1-flash-lite-preview"] as const;
 export const OPENAI_LOW_MODELS = ["gpt-5.4-lite"] as const;
 
+// OpenRouter model tiers — model IDs always contain "/" (provider/name).
+export const OPENROUTER_MAIN_MODELS = [
+    "openai/gpt-4o",
+    "anthropic/claude-opus-4-5",
+    "google/gemini-pro-1.5",
+] as const;
+export const OPENROUTER_MID_MODELS = [
+    "openai/gpt-4o-mini",
+    "anthropic/claude-sonnet-4-5",
+] as const;
+export const OPENROUTER_LOW_MODELS = [
+    "meta-llama/llama-3.1-8b-instruct",
+] as const;
+
 export const DEFAULT_MAIN_MODEL = "gemini-3-flash-preview";
 export const DEFAULT_TITLE_MODEL = "gemini-3.1-flash-lite-preview";
 export const DEFAULT_TABULAR_MODEL = "gemini-3-flash-preview";
@@ -36,12 +50,15 @@ const ALL_MODELS = new Set<string>([
     ...CLAUDE_MAIN_MODELS,
     ...GEMINI_MAIN_MODELS,
     ...OPENAI_MAIN_MODELS,
+    ...OPENROUTER_MAIN_MODELS,
     ...CLAUDE_MID_MODELS,
     ...GEMINI_MID_MODELS,
     ...OPENAI_MID_MODELS,
+    ...OPENROUTER_MID_MODELS,
     ...CLAUDE_LOW_MODELS,
     ...GEMINI_LOW_MODELS,
     ...OPENAI_LOW_MODELS,
+    ...OPENROUTER_LOW_MODELS,
 ]);
 
 // ---------------------------------------------------------------------------
@@ -49,6 +66,8 @@ const ALL_MODELS = new Set<string>([
 // ---------------------------------------------------------------------------
 
 export function providerForModel(model: string): Provider {
+    // OpenRouter model IDs always contain "/" (e.g. "openai/gpt-4o").
+    if (model.includes("/")) return "openrouter";
     if (model.startsWith("claude")) return "claude";
     if (model.startsWith("gemini")) return "gemini";
     if (model.startsWith("gpt-")) return "openai";
