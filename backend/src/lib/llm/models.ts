@@ -30,9 +30,10 @@ export const OPENAI_LOW_MODELS = ["gpt-5.4-lite"] as const;
 
 // OpenRouter model tiers — model IDs always contain "/" (provider/name).
 export const OPENROUTER_MAIN_MODELS = [
-    "openai/gpt-4o",
-    "anthropic/claude-opus-4-5",
-    "google/gemini-pro-1.5",
+    "deepseek/deepseek-r1",
+    "deepseek/deepseek-v4-flash",
+    "meta-llama/llama-3.3-70b-instruct",
+    "qwen/qwen-2.5-coder-32b-instruct",
 ] as const;
 export const OPENROUTER_MID_MODELS = [
     "openai/gpt-4o-mini",

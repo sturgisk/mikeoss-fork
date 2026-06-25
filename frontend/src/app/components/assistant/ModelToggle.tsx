@@ -40,12 +40,12 @@ export const SETTINGS_MODELS: ModelOption[] = [
         group: "Google",
     },
     { id: "gpt-5.4-lite", label: "GPT-5.4 Lite", group: "OpenAI" },
-    { id: "openai/gpt-4o", label: "GPT-4o (via OpenRouter)", group: "OpenRouter" },
+    { id: "deepseek/deepseek-r1", label: "DeepSeek R1", group: "OpenRouter" },
+    { id: "deepseek/deepseek-v4-flash", label: "DeepSeek V4 Flash", group: "OpenRouter" },
+    { id: "meta-llama/llama-3.3-70b-instruct", label: "Meta Llama 3.3 70B", group: "OpenRouter" },
+    { id: "qwen/qwen-2.5-coder-32b-instruct", label: "Qwen 2.5 Coder 32B", group: "OpenRouter" },
     { id: "openai/gpt-4o-mini", label: "GPT-4o Mini (via OpenRouter)", group: "OpenRouter" },
-    { id: "anthropic/claude-opus-4-5", label: "Claude Opus 4.5 (via OpenRouter)", group: "OpenRouter" },
     { id: "anthropic/claude-sonnet-4-5", label: "Claude Sonnet 4.5 (via OpenRouter)", group: "OpenRouter" },
-    { id: "google/gemini-pro-1.5", label: "Gemini Pro 1.5 (via OpenRouter)", group: "OpenRouter" },
-    { id: "meta-llama/llama-3.1-8b-instruct", label: "Llama 3.1 8B (via OpenRouter)", group: "OpenRouter" },
 ];
 
 export const DEFAULT_MODEL_ID = "gemini-3-flash-preview";
