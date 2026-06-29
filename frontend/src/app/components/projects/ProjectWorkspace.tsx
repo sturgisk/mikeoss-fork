@@ -21,6 +21,7 @@ import {
     listTabularReviews,
     updateProject,
 } from "@/app/lib/mikeApi";
+import { dsmbExtensionsEnabled } from "@/dsmb/config";
 import type {
     Chat,
     ColumnConfig,
@@ -92,13 +93,14 @@ function activeSectionFromSegments(
 ): ProjectWorkspaceSection {
     if (segments[0] === "assistant") return "assistant";
     if (segments[0] === "tabular-reviews") return "reviews";
+    if (segments[0] === "litigation") return "litigation";
     return "documents";
 }
 
 function shouldShowWorkspaceShell(segments: string[]) {
     if (segments.length === 0) return true;
     if (segments.length !== 1) return false;
-    return segments[0] === "assistant" || segments[0] === "tabular-reviews";
+    return segments[0] === "assistant" || segments[0] === "tabular-reviews" || segments[0] === "litigation";
 }
 
 export function ProjectWorkspaceProvider({
@@ -113,7 +115,7 @@ export function ProjectWorkspaceProvider({
     const [projectLoading, setProjectLoading] = useState(true);
     const [searchBySection, setSearchBySection] = useState<
         Record<ProjectWorkspaceSection, string>
-    >({ documents: "", assistant: "", reviews: "" });
+    >({ documents: "", assistant: "", reviews: "", litigation: "" });
     const [projectChats, setProjectChats] = useState<Chat[] | null>(null);
     const [projectReviews, setProjectReviews] = useState<
         TabularReview[] | null
@@ -529,14 +531,20 @@ export function ProjectSectionToolbar({
 }) {
     const { activeSection, projectId } = useProjectWorkspace();
     const router = useRouter();
+    const litigationEnabled = dsmbExtensionsEnabled();
+
+    const items = [
+        { id: "documents", label: "Documents" },
+        { id: "assistant", label: "Assistant Chats" },
+        { id: "reviews", label: "Tabular Reviews" },
+        ...(litigationEnabled
+            ? [{ id: "litigation" as const, label: "Litigation" }]
+            : []),
+    ];
 
     return (
         <TableToolbar
-            items={[
-                { id: "documents", label: "Documents" },
-                { id: "assistant", label: "Assistant Chats" },
-                { id: "reviews", label: "Tabular Reviews" },
-            ]}
+            items={items}
             active={activeSection}
             onChange={(next) => {
                 const href =
@@ -544,7 +552,9 @@ export function ProjectSectionToolbar({
                         ? `/projects/${projectId}`
                         : next === "assistant"
                           ? `/projects/${projectId}/assistant`
-                          : `/projects/${projectId}/tabular-reviews`;
+                          : next === "litigation"
+                            ? `/projects/${projectId}/litigation`
+                            : `/projects/${projectId}/tabular-reviews`;
                 router.push(href);
             }}
             actions={actions}

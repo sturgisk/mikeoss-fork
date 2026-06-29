@@ -59,3 +59,18 @@ export function resolveModel(id: string | null | undefined, fallback: string): s
     if (id && ALL_MODELS.has(id)) return id;
     return fallback;
 }
+
+export function isKnownModel(id: string): boolean {
+    return ALL_MODELS.has(id);
+}
+
+/** Models suitable for phase evaluation (excludes top-tier worker models). */
+export const JUDGE_MODEL_CANDIDATES = [
+    ...CLAUDE_LOW_MODELS,
+    ...CLAUDE_MID_MODELS,
+    ...GEMINI_LOW_MODELS,
+    ...GEMINI_MID_MODELS,
+    ...OPENAI_LOW_MODELS,
+    ...OPENAI_MID_MODELS,
+    "gemini-3.1-pro-preview",
+] as const;

@@ -1,0 +1,228 @@
+{
+  "id": "motion-to-dismiss",
+  "pack": "litigation",
+  "title": "Motion to Dismiss",
+  "description": "Analyze complaint and exhibits, research supporting authority, and draft a motion to dismiss with human review at each critical step.",
+  "variants": [
+    {
+      "id": "mtd-12b6",
+      "title": "Rule 12(b)(6) — Failure to State a Claim",
+      "description": "Challenge the sufficiency of the complaint under Twombly/Iqbal pleading standards.",
+      "focus": "pleading sufficiency and element failure",
+      "research_emphasis": "elements, factual insufficiency, plausible claim standard",
+      "draft_template": "Federal Rule 12(b)(6) motion focusing on failure to state a claim"
+    },
+    {
+      "id": "mtd-12b1",
+      "title": "Rule 12(b)(1) — Lack of Subject-Matter Jurisdiction",
+      "description": "Challenge standing, ripeness, mootness, or other jurisdictional defects.",
+      "focus": "subject-matter jurisdiction, standing, and justiciability",
+      "research_emphasis": "Article III standing, statutory jurisdiction, ripeness, mootness",
+      "draft_template": "Federal Rule 12(b)(1) motion focusing on lack of subject-matter jurisdiction"
+    },
+    {
+      "id": "mtd-12b3",
+      "title": "Rule 12(b)(3) — Improper Venue / Forum Non Conveniens",
+      "description": "Challenge venue selection or seek transfer/dismissal for forum reasons.",
+      "focus": "venue, transfer, and forum non conveniens",
+      "research_emphasis": "venue statutes, § 1404 transfer, convenience factors",
+      "draft_template": "Federal Rule 12(b)(3) motion focusing on improper venue or forum non conveniens"
+    }
+  ],
+  "phases": [
+    {
+      "id": "intake",
+      "title": "Intake & Indexing",
+      "type": "agent",
+      "agent_id": "intake-agent",
+      "hitl_after": [
+        {
+          "id": "confirm-doc-set",
+          "prompt": "Review the indexed complaint and exhibits. Confirm the document set is complete or note missing items.",
+          "actions": ["approve", "edit", "skip"]
+        }
+      ],
+      "next": "complaint_analysis"
+    },
+    {
+      "id": "complaint_analysis",
+      "title": "Complaint Analysis",
+      "type": "agent",
+      "agent_id": "pleading-analyst",
+      "hitl_after": [
+        {
+          "id": "confirm-claims-chart",
+          "prompt": "Review the claims chart and element mapping. Edit before research begins.",
+          "actions": ["approve", "edit", "reject"]
+        }
+      ],
+      "next": "exhibit_analysis"
+    },
+    {
+      "id": "exhibit_analysis",
+      "title": "Exhibit Analysis",
+      "type": "agent",
+      "agent_id": "exhibit-analyst",
+      "hitl_after": [
+        {
+          "id": "confirm-exhibit-index",
+          "prompt": "Review the exhibit index and exhibit-to-allegation mapping.",
+          "actions": ["approve", "edit", "skip"]
+        }
+      ],
+      "next": "research_plan"
+    },
+    {
+      "id": "research_plan",
+      "title": "Research Plan",
+      "type": "agent",
+      "agent_id": "research-planner",
+      "hitl_after": [
+        {
+          "id": "approve-research-queries",
+          "prompt": "Approve, edit, or reject the proposed legal research queries before any research runs.",
+          "actions": ["approve", "edit", "reject"]
+        }
+      ],
+      "next": "legal_research"
+    },
+    {
+      "id": "legal_research",
+      "title": "Legal Research",
+      "type": "agent",
+      "agent_id": "research-executor",
+      "hitl_after": [
+        {
+          "id": "review-research-memos",
+          "prompt": "Review research memos and citations. Request refinement or approve to proceed.",
+          "actions": ["approve", "edit", "reject"]
+        }
+      ],
+      "next": "argument_outline"
+    },
+    {
+      "id": "argument_outline",
+      "title": "Argument Outline",
+      "type": "agent",
+      "agent_id": "argument-architect",
+      "hitl_after": [
+        {
+          "id": "select-arguments",
+          "prompt": "Select and refine the arguments to include in the motion.",
+          "actions": ["approve", "edit", "reject"]
+        }
+      ],
+      "next": "draft_motion"
+    },
+    {
+      "id": "draft_motion",
+      "title": "Draft Motion",
+      "type": "agent",
+      "agent_id": "drafting-agent",
+      "hitl_after": [
+        {
+          "id": "review-draft",
+          "prompt": "Review the draft motion and exported Word document. Approve or request revisions.",
+          "actions": ["approve", "edit", "reject"]
+        }
+      ],
+      "next": null
+    }
+  ],
+  "subagents": {
+    "doc-indexer": {
+      "description": "Lists and reads project documents to build a document inventory.",
+      "system_prompt": "You index litigation documents. Use list_project_documents and read_project_document. Return a structured inventory of complaint vs exhibits with doc labels and filenames.",
+      "max_turns": 8
+    },
+    "vault-writer": {
+      "description": "Writes structured markdown files to the matter vault.",
+      "system_prompt": "You write matter vault files using write_vault_file and read_vault_file. Produce clean markdown with headings and bullet lists.",
+      "max_turns": 8
+    },
+    "claims-mapper": {
+      "description": "Maps complaint counts to legal elements and key allegations.",
+      "system_prompt": "You build claims charts. Focus on: {{variant.focus}}. Read complaint text and vault files; output element-by-element mapping.",
+      "max_turns": 12
+    },
+    "exhibit-mapper": {
+      "description": "Maps exhibits to complaint allegations.",
+      "system_prompt": "You map exhibits to allegations. Focus on: {{variant.focus}}. Note authentication and relevance issues.",
+      "max_turns": 12
+    },
+    "query-drafter": {
+      "description": "Drafts CourtListener research query proposals without executing them.",
+      "system_prompt": "You draft research queries for {{variant.title}}. Emphasize: {{variant.research_emphasis}}. Output JSON array of {id, query, rationale, priority}. Do not call courtlistener tools.",
+      "max_turns": 8
+    },
+    "citation-researcher": {
+      "description": "Runs CourtListener searches and verifies citations for one issue thread.",
+      "system_prompt": "You execute CourtListener research for one approved query. Use courtlistener_search_case_law, courtlistener_verify_citations, and courtlistener_get_cases. Write concise findings with cite-ready quotes.",
+      "max_turns": 14
+    },
+    "memo-writer": {
+      "description": "Writes a research memo for one issue thread into the vault.",
+      "system_prompt": "You write research memos under research/memos/. Include holding, rationale, and citation strings suitable for a motion.",
+      "max_turns": 10
+    },
+    "outline-writer": {
+      "description": "Drafts motion section outlines from analysis and research.",
+      "system_prompt": "You draft motion outlines for {{variant.draft_template}}. Use vault analysis and research memos.",
+      "max_turns": 10
+    },
+    "motion-drafter": {
+      "description": "Drafts full motion prose sections for Word export.",
+      "system_prompt": "You draft formal motion sections with headings, standard of review, and argument subsections. Match {{variant.draft_template}}.",
+      "max_turns": 14
+    },
+    "docx-exporter": {
+      "description": "Exports the motion to a Word document via generate_docx.",
+      "system_prompt": "You export motions to Word using generate_docx. Read drafts/mtd-outline.md or drafts/mtd-draft.md and convert to structured sections with heading levels. Attach to the matter project.",
+      "max_turns": 8
+    }
+  },
+  "agents": {
+    "intake-agent": {
+      "description": "Orchestrates intake indexing of complaint and exhibits.",
+      "system_prompt": "You are the intake orchestrator. Delegate document inventory to doc-indexer, then delegate vault writes to vault-writer to create analysis/intake/index.md and analysis/complaint-index.md. Use the Agent tool for subagents. Only use mike-bridge MCP tools.",
+      "max_turns": 14,
+      "subagents": ["doc-indexer", "vault-writer"]
+    },
+    "pleading-analyst": {
+      "description": "Orchestrates claims chart creation.",
+      "system_prompt": "You orchestrate complaint analysis for {{variant.title}}. Delegate claims mapping to claims-mapper, then delegate vault-writer to save analysis/claims-chart.md. Focus: {{variant.focus}}.",
+      "max_turns": 16,
+      "subagents": ["claims-mapper", "vault-writer"]
+    },
+    "exhibit-analyst": {
+      "description": "Orchestrates exhibit-to-allegation mapping.",
+      "system_prompt": "You orchestrate exhibit analysis. Delegate mapping to exhibit-mapper, then vault-writer for analysis/exhibit-index.md. Focus: {{variant.focus}}.",
+      "max_turns": 16,
+      "subagents": ["exhibit-mapper", "vault-writer"]
+    },
+    "research-planner": {
+      "description": "Orchestrates research query planning (no execution).",
+      "system_prompt": "You orchestrate research planning for {{variant.title}}. Delegate query drafting to query-drafter, then vault-writer to save research/queries-proposed.json. Do NOT execute CourtListener research.",
+      "max_turns": 12,
+      "subagents": ["query-drafter", "vault-writer"]
+    },
+    "research-executor": {
+      "description": "Orchestrates approved legal research and memo writing.",
+      "system_prompt": "You orchestrate legal research. Read research/queries-approved.json. For each approved query, delegate citation-researcher then memo-writer. Update research/citations.json via vault-writer. Emphasize: {{variant.research_emphasis}}.",
+      "max_turns": 22,
+      "subagents": ["citation-researcher", "memo-writer", "vault-writer"]
+    },
+    "argument-architect": {
+      "description": "Orchestrates motion argument outline.",
+      "system_prompt": "You orchestrate argument outlining for {{variant.draft_template}}. Delegate to outline-writer, then vault-writer for drafts/mtd-outline.md.",
+      "max_turns": 14,
+      "subagents": ["outline-writer", "vault-writer"]
+    },
+    "drafting-agent": {
+      "description": "Orchestrates motion draft markdown and Word export.",
+      "system_prompt": "You orchestrate motion drafting. Delegate motion-drafter for drafts/mtd-draft.md, then docx-exporter to call generate_docx and record export metadata in drafts/mtd-export.json via vault-writer. Match {{variant.draft_template}}.",
+      "max_turns": 20,
+      "subagents": ["motion-drafter", "docx-exporter", "vault-writer"]
+    }
+  }
+}
